@@ -133,7 +133,7 @@ function blackhole() {
 	if ($badbot > 0) {
 		
 		echo '<h1>You have been banned from this domain</h1>';
-		echo '<p>If you think there has been a mistake, <a href="/">contact the administrator</a> via proxy server.</p>';
+		echo '<p>If you think there has been a mistake, <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.</p>';
 		
 		exit;
 		
