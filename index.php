@@ -1,68 +1,45 @@
 <?php
-/*
-Title:        Blackhole for Bad Bots
-Description:  Automatically trap and block bots that don't obey robots.txt rules
-Project URL:  http://perishablepress.com/blackhole-bad-bots/
-Author:       Jeff Starr (aka Perishable)
-Version:      4.0
-License:      GPLv2 or later
-License URI:  https://www.gnu.org/licenses/gpl-2.0.txt
+
+	/*
+
+	Title:        Blackhole for Bad Bots
+	Description:  Automatically trap and block bots that don't obey robots.txt rules
+	Project URL:  http://perishablepress.com/blackhole-bad-bots/
+	Author:       Jeff Starr (aka Perishable)
+	Version:      4.0
+	License:      GPLv2 or later
+	License URI:  https://www.gnu.org/licenses/gpl-2.0.txt
 
 
+	USAGE:
+	1. Add the /blackhole/ folder to the root directory of your site.
+	2. Open /blackhole/index.php and edit the three variables in the "EDIT HERE" section.
+	3. Change file permissions for blackhole.dat to make it writable by the server.
+	4. Add this line to the beginning of all pages:
+	<?php include(realpath(getenv('DOCUMENT_ROOT')) . '/blackhole/index.php'); ?>
+	5. Add this line to the footer of all pages (change "example.com" to match your domain):
+	<a rel="nofollow" style="display:none;" href="https://example.com/blackhole/">Do NOT follow this link or you will be banned from the site!</a>
+	6. Add these lines to your site's robots.txt file:
+	User-agent: *
+	Disallow: /blackhole/
+	7. Done! Remember to test thoroughly before going live.
 
-USAGE:
+	TESTING:
+	1. Test your robots.txt rules for proper syntax (for example, you can use the robots checker in Google Webmaster Tools).
+	2. Visit the link from step 5, and then try visiting other pages on your site.
+	Tip: To reset the Blackhole list, clear the contents of the blackhole.dat file.
+	For complete infos, visit: https://perishablepress.com/blackhole-bad-bots-php-version/
+	
+	*/
 
-1. Add the /blackhole/ folder to the root directory of your site.
+	// EDIT HERE
+	define('BLACKHOLE_TO',      'blackhole@badbots.cf'); // email to
+	define('BLACKHOLE_FROM',    'report@badbots.cf'); // email from
+	define('BLACKHOLE_SUBJECT', 'Bad Bot Alert!');    // email subject
 
-2. Open /blackhole/index.php and edit the three variables in the "EDIT HERE" section.
-
-3. Change file permissions for blackhole.dat to make it writable by the server.
-
-4. Add this line to the beginning of all pages:
-
-<?php include(realpath(getenv('DOCUMENT_ROOT')) . '/blackhole/index.php'); ?>
-
-5. Add this line to the footer of all pages (change "example.com" to match your domain):
-
-<a rel="nofollow" style="display:none;" href="https://example.com/blackhole/">Do NOT follow this link or you will be banned from the site!</a>
-
-6. Add these lines to your site's robots.txt file:
-
-User-agent: *
-Disallow: /blackhole/
-
-7. Done! Remember to test thoroughly before going live.
-
-
-
-TESTING:
-
-1. Test your robots.txt rules for proper syntax (for example, you can use the robots checker in Google Webmaster Tools).
-
-2. Visit the link from step 5, and then try visiting other pages on your site.
-
-Tip: To reset the Blackhole list, clear the contents of the blackhole.dat file.
-
-For complete infos, visit: https://perishablepress.com/blackhole-bad-bots-php-version/
-
-*/
-
-
-
-// EDIT HERE
-
-define('BLACKHOLE_TO',      'blackhole@badbots.cf'); // email to
-define('BLACKHOLE_FROM',    'report@badbots.cf'); // email from
-define('BLACKHOLE_SUBJECT', 'Bad Bot Alert!');    // email subject
-
-
-
-// DO NOT EDIT BELOW THIS LINE
-
-define('BLACKHOLE_VERSION', '4.0');
-define('BLACKHOLE_PATH', realpath(getenv('DOCUMENT_ROOT')) . '/');
-
-
+	// DO NOT EDIT BELOW THIS LINE
+	define('BLACKHOLE_VERSION', '4.0');
+	define('BLACKHOLE_PATH', realpath(getenv('DOCUMENT_ROOT')) . '/');
 
 function blackhole_get_vars() {
 	
@@ -87,8 +64,6 @@ function blackhole_get_vars() {
 	return array($ip, $whois, $ua, $request, $protocol, $method, $date, $time);
 	
 }
-
-
 
 function blackhole_checkbot($ip, $ua, $request) {
 	
@@ -122,36 +97,21 @@ function blackhole_checkbot($ip, $ua, $request) {
 	
 }
 
-
-
 function blackhole() {
 	
 	list ($ip, $whois, $ua, $request, $protocol, $method, $date, $time) = blackhole_get_vars();
 	
 	$badbot = blackhole_checkbot($ip, $ua, $request);
-	
+
+	$result = null;
+
 	if ($badbot > 0) {
-	?><!DOCTYPE html>
-	<html lang="en-US">
-		<head>
-			<title>Welcome to Blackhole!</title>
-			<style>
-				body { color: #fff; background-color: #851507; font: 14px/1.5 Helvetica, Arial, sans-serif; }
-				#blackhole { text-align: center; margin: 20px auto; width: 700px; }
-				pre { padding: 20px; white-space: pre-line; border-radius: 10px; background-color: #b34334; }
-				a { color: #fff; }
-			</style>
-		</head>
-		<body>
-			<div id="blackhole">
-				<h1>You have been banned from this domain</h1>
-				<p>If you think there has been a mistake, <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.</p>
-			</div>
-		</body>
-	</html><?php
-		exit;
-		
-	} elseif ($badbot === 0) {
+
+		$result = "<h1>You have been banned from this domain!</h1>";
+		$result .= "<p>If you think there has been a mistake, <a href='https://github.com/wgenial/badbots/issues'>contact the administrator</a>.</p>";
+
+	} 
+	elseif ($badbot === 0) {
 		
 		$filename = BLACKHOLE_PATH . 'blackhole.dat';
 		
@@ -169,41 +129,18 @@ function blackhole() {
 		
 		mail (BLACKHOLE_TO, BLACKHOLE_SUBJECT, $message, 'From: '. BLACKHOLE_FROM);
 		
-		?><!DOCTYPE html>
-<html lang="en-US">
-	<head>
-		<title>Welcome to Blackhole!</title>
-		<style>
-			body { color: #fff; background-color: #851507; font: 14px/1.5 Helvetica, Arial, sans-serif; }
-			#blackhole { text-align: center; margin: 20px auto; width: 700px; }
-			pre { padding: 20px; white-space: pre-line; border-radius: 10px; background-color: #b34334; }
-			a { color: #fff; }
-		</style>
-	</head>
-	<body>
-		<div id="blackhole">
-			<h1>You have fallen into a trap!</h1>
-			<p>
-				This site&rsquo;s <a href="/robots.txt">robots.txt</a> file explicitly forbids your presence at this location. 
-				The following Whois data will be reviewed carefully. If it is determined that you suck, you will be banned from this site. 
-				If you think this is a mistake, <em>now</em> is the time to <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.
-			</p>
-			<h3>Your IP Address is <?php echo $ip; ?></h3>
-			<pre>WHOIS Lookup for <?php echo $ip ."\n". $date ."\n\n". $whois; ?></pre>
-			<p><a href="http://perishablepress.com/blackhole-bad-bots/" title="Blackhole for Bad Bots">Blackhole v<?php echo BLACKHOLE_VERSION; ?></a></p>
-		</div>
-	</body>
-</html><?php
-		
-		exit;
+		$result = "<h1>You have fallen into a trap!</h1>";
+		$result .= "<p>This site&rsquo;s <a href='/robots.txt'>robots.txt</a> file explicitly forbids your presence at this location. The following Whois data will be reviewed carefully. <br>If it is determined that you suck, you will be banned from this site. If you think this is a mistake, <em>now</em> is the time to <a href='https://github.com/wgenial/badbots/issues'>contact the administrator</a>.</p>";
+		$result .= "<h3>Your IP Address is ". $ip . "</h3>";
+		$result .= "<pre>WHOIS Lookup for ". $ip ."\n". $date ."\n\n". $whois ."</pre>";
+		$result .= "<p><a href='https://github.com/wgenial/badbots' title='Blackhole for Bad Bots'>Blackhole v". BLACKHOLE_VERSION ."</a></p>";
 		
 	}
 	
-	return false;
+	return $result;
+	exit;
 	
 }
-
-
 
 function blackhole_whitelist($ua) {
 	
@@ -217,8 +154,6 @@ function blackhole_whitelist($ua) {
 	
 }
 
-
-
 function blackhole_sanitize($string) {
 	
 	$string = trim($string); 
@@ -230,8 +165,6 @@ function blackhole_sanitize($string) {
 	return $string;
 	
 }
-
-
 
 function blackhole_get_ip() {
 	
@@ -246,8 +179,6 @@ function blackhole_get_ip() {
 	return blackhole_sanitize($ip);
 	
 }
-
-
 
 function blackhole_evaluate_ip() {
 	 
@@ -279,8 +210,6 @@ function blackhole_evaluate_ip() {
 	
 }
 
-
-
 function blackhole_normalize_ip($ip) {
 	
 	if (strpos($ip, ':') !== false && substr_count($ip, '.') == 3 && strpos($ip, '[') === false) {
@@ -300,8 +229,6 @@ function blackhole_normalize_ip($ip) {
 	return $ip;
 	
 }
-
-
 
 function blackhole_validate_ip($ip) {
 	
@@ -330,8 +257,6 @@ function blackhole_validate_ip($ip) {
 	return $filtered;
 	
 }
-
-
 
 function blackhole_whois() {
 	
@@ -412,8 +337,54 @@ function blackhole_whois() {
 	
 }
 
-
-
-blackhole();
-
-
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>BadBots</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		html, body {
+			height: 100%;
+		}
+		body {
+			font: 14px/1.5 Arial;
+		}
+		#container {
+			align-items: center;
+			background: hsla(31,15%,50%,.1);
+			display: flex;
+			justify-content: center;
+			height: 100%;
+		}
+		#content {
+			background: hsla(31,15%,50%,.1);
+			box-shadow: 4px 4px 0px hsl(20, 1%, 75%);
+			margin: 20px auto;
+			max-width: 50%;
+			text-align: center;
+			padding: 20px;
+		}
+		pre { 
+			background-color: #fff;
+			border: 1px solid hsl(20, 1%, 75%);
+			font: 13px/1.4 monospace;
+			padding: 10px;
+			margin: 10px;
+			white-space: pre-line;
+			word-break: break-all;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="content"><? echo blackhole(); ?></div>
+	</div>
+</body>
+</html>
