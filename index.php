@@ -51,8 +51,8 @@ For complete infos, visit: https://perishablepress.com/blackhole-bad-bots-php-ve
 
 // EDIT HERE
 
-define('BLACKHOLE_TO',      'blackhole@badbot.cf'); // email to
-define('BLACKHOLE_FROM',    'report@badbot.cf'); // email from
+define('BLACKHOLE_TO',      'blackhole@badbots.cf'); // email to
+define('BLACKHOLE_FROM',    'report@badbots.cf'); // email from
 define('BLACKHOLE_SUBJECT', 'Bad Bot Alert!');    // email subject
 
 
@@ -131,10 +131,24 @@ function blackhole() {
 	$badbot = blackhole_checkbot($ip, $ua, $request);
 	
 	if ($badbot > 0) {
-		
-		echo '<h1>You have been banned from this domain</h1>';
-		echo '<p>If you think there has been a mistake, <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.</p>';
-		
+	?><!DOCTYPE html>
+	<html lang="en-US">
+		<head>
+			<title>Welcome to Blackhole!</title>
+			<style>
+				body { color: #fff; background-color: #851507; font: 14px/1.5 Helvetica, Arial, sans-serif; }
+				#blackhole { text-align: center; margin: 20px auto; width: 700px; }
+				pre { padding: 20px; white-space: pre-line; border-radius: 10px; background-color: #b34334; }
+				a { color: #fff; }
+			</style>
+		</head>
+		<body>
+			<div id="blackhole">
+				<h1>You have been banned from this domain</h1>
+				<p>If you think there has been a mistake, <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.</p>
+			</div>
+		</body>
+	</html><?php
 		exit;
 		
 	} elseif ($badbot === 0) {
@@ -161,7 +175,7 @@ function blackhole() {
 		<title>Welcome to Blackhole!</title>
 		<style>
 			body { color: #fff; background-color: #851507; font: 14px/1.5 Helvetica, Arial, sans-serif; }
-			#blackhole { margin: 20px auto; width: 700px; }
+			#blackhole { text-align: center; margin: 20px auto; width: 700px; }
 			pre { padding: 20px; white-space: pre-line; border-radius: 10px; background-color: #b34334; }
 			a { color: #fff; }
 		</style>
@@ -172,7 +186,7 @@ function blackhole() {
 			<p>
 				This site&rsquo;s <a href="/robots.txt">robots.txt</a> file explicitly forbids your presence at this location. 
 				The following Whois data will be reviewed carefully. If it is determined that you suck, you will be banned from this site. 
-				If you think this is a mistake, <em>now</em> is the time to <a href="/contact/">contact the administrator</a>.
+				If you think this is a mistake, <em>now</em> is the time to <a href="https://github.com/wgenial/badbots/issues">contact the administrator</a>.
 			</p>
 			<h3>Your IP Address is <?php echo $ip; ?></h3>
 			<pre>WHOIS Lookup for <?php echo $ip ."\n". $date ."\n\n". $whois; ?></pre>
