@@ -354,20 +354,19 @@ function blackhole_whois() {
 			height: 100%;
 		}
 		body {
+			background: hsla(31,15%,50%,.1);
 			font: 14px/1.5 Arial;
 		}
 		#container {
 			align-items: center;
-			background: hsla(31,15%,50%,.1);
 			display: flex;
 			justify-content: center;
-			height: 100%;
 		}
 		#content {
 			background: hsla(31,15%,50%,.1);
 			box-shadow: 4px 4px 0px hsl(20, 1%, 75%);
 			margin: 20px auto;
-			max-width: 50%;
+			max-width: 60%;
 			text-align: center;
 			padding: 20px;
 		}
